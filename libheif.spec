@@ -1,6 +1,10 @@
+# Disable dynamic plugins, make them built in until this is fixed:
+# https://github.com/strukturag/libheif/issues/745
+#global dynamic_plugins 1
+
 Name:           libheif
 Version:        1.14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:        LGPLv3+ and MIT
 URL:            https://github.com/strukturag/%{name}
@@ -41,12 +45,12 @@ developing applications that use %{name}.
 
 %prep
 %autosetup -p1
-rm -rf third-party/
 
 %build
 %cmake \
  -GNinja \
  -DBUILD_SHARED_LIBS=ON \
+%if 0%{?dynamic_plugins:1}
  -DENABLE_PLUGIN_LOADING=ON \
  -DWITH_AOM_DECODER_PLUGIN=ON \
  -DWITH_AOM_ENCODER_PLUGIN=ON \
@@ -57,6 +61,7 @@ rm -rf third-party/
 %endif
  -DWITH_RAV1E_PLUGIN=ON \
  -DWITH_X265_PLUGIN=ON
+%endif
 
 %cmake_build
 
@@ -74,15 +79,19 @@ rm -rf third-party/
 %{_bindir}/heif-thumbnailer
 %{_libdir}/%{name}.so.1
 %{_libdir}/%{name}.so.%{version}
+%if 0%{?dynamic_plugins:1}
 %{_libdir}/%{name}/%{name}-aomdec.so
 %{_libdir}/%{name}/%{name}-aomenc.so
 %{_libdir}/%{name}/%{name}-dav1d.so
 %{_libdir}/%{name}/%{name}-libde265.so
+%endif
 %{_libdir}/%{name}/%{name}-rav1e.so
 %ifarch x86_64
 %{_libdir}/%{name}/%{name}-svtenc.so
 %endif
+%if 0%{?dynamic_plugins:1}
 %{_libdir}/%{name}/%{name}-x265.so
+%endif
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 %{_datadir}/mime/packages/avif.xml
 %{_datadir}/mime/packages/heif.xml
@@ -99,5 +108,8 @@ rm -rf third-party/
 %{_libdir}/%{name}.so
 
 %changelog
+* Fri Jan 13 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-2
+- Temporarily disable dynamic plugins due to a bug.
+
 * Thu Jan 12 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-1
 - First build.

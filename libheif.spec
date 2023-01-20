@@ -3,12 +3,9 @@
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 #global tag %{version}
 
-# Momentarily disable SVT encoder plugin
-#global svt_plugin 1
-
 Name:       libheif
 Version:    1.14.2
-Release:    3%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Release:    4%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -17,6 +14,8 @@ URL:        https://github.com/strukturag/%{name}
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %else
 Source0:    %{url}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
+Patch0:     %{url}/commit/b6812284a2d70f29a5121ec3dbe652da07fdbbb7.patch
+Patch1:     %{url}/commit/2ca02a128b2f76f7f293aa86a2ce1e04a8306c65.patch
 %endif
 
 BuildRequires:  cmake
@@ -29,10 +28,8 @@ BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(rav1e)
-%if 0%{?svt_plugin:1}
 %ifarch x86_64
 BuildRequires:  pkgconfig(SvtAv1Enc)
-%endif
 %endif
 BuildRequires:  pkgconfig(x265)
 
@@ -69,10 +66,8 @@ developing applications that use %{name}.
  -DWITH_AOM_ENCODER_PLUGIN=ON \
  -DWITH_DAV1D_PLUGIN=ON \
  -DWITH_LIBDE265_PLUGIN=ON \
-%if 0%{?svt_plugin:1}
 %ifarch x86_64
  -DWITH_SvtEnc_PLUGIN=ON \
-%endif
 %endif
  -DWITH_RAV1E_PLUGIN=ON \
  -DWITH_X265_PLUGIN=ON
@@ -96,10 +91,8 @@ developing applications that use %{name}.
 %{_libdir}/%{name}/%{name}-dav1d.so
 %{_libdir}/%{name}/%{name}-libde265.so
 %{_libdir}/%{name}/%{name}-rav1e.so
-%if 0%{?svt_plugin:1}
 %ifarch x86_64
 %{_libdir}/%{name}/%{name}-svtenc.so
-%endif
 %endif
 %{_libdir}/%{name}/%{name}-x265.so
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
@@ -118,6 +111,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Fri Jan 20 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-4.20230119git96a114f
+- Enable SVT-AV1 encoder.
+
 * Fri Jan 20 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-3.20230119git96a114f
 - Rebase to latest snapshot, dynamic plugin linking is fixed.
 - Temporarily drop SVT encoder plugin.

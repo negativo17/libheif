@@ -1,15 +1,20 @@
-# Disable dynamic plugins, make them built in until this is fixed:
-# https://github.com/strukturag/libheif/issues/745
-#global dynamic_plugins 1
+%global commit0 96a114f7e1e49d1a6f07dea0f249d260fb5d4294
+%global date 20230119
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+#global tag %{version}
 
-Name:           libheif
-Version:        1.14.2
-Release:        2%{?dist}
-Summary:        ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
-License:        LGPLv3+ and MIT
-URL:            https://github.com/strukturag/%{name}
+Name:       libheif
+Version:    1.14.2
+Release:    3%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
+License:    LGPLv3+ and MIT
+URL:        https://github.com/strukturag/%{name}
 
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+%if 0%{?tag:1}
+Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+%else
+Source0:    %{url}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
+%endif
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -35,22 +40,25 @@ format decoder and encoder.
 HEIF and AVIF are new image file formats employing HEVC (h.265) or AV1 image
 coding, respectively, for the best compression ratios currently possible.
 
-%package        devel
-Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+%package    devel
+Summary:    Development files for %{name}
+Requires:   %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
+%if 0%{?tag:1}
 %autosetup -p1
+%else
+%autosetup -p1 -n %{name}-%{commit0}
+%endif
 
 %build
 %cmake \
  -GNinja \
  -DBUILD_SHARED_LIBS=ON \
-%if 0%{?dynamic_plugins:1}
  -DENABLE_PLUGIN_LOADING=ON \
  -DWITH_AOM_DECODER_PLUGIN=ON \
  -DWITH_AOM_ENCODER_PLUGIN=ON \
@@ -61,14 +69,11 @@ developing applications that use %{name}.
 %endif
  -DWITH_RAV1E_PLUGIN=ON \
  -DWITH_X265_PLUGIN=ON
-%endif
 
 %cmake_build
 
 %install
 %cmake_install
-
-%{?ldconfig_scriptlets}
 
 %files
 %license COPYING
@@ -79,19 +84,15 @@ developing applications that use %{name}.
 %{_bindir}/heif-thumbnailer
 %{_libdir}/%{name}.so.1
 %{_libdir}/%{name}.so.%{version}
-%if 0%{?dynamic_plugins:1}
 %{_libdir}/%{name}/%{name}-aomdec.so
 %{_libdir}/%{name}/%{name}-aomenc.so
 %{_libdir}/%{name}/%{name}-dav1d.so
 %{_libdir}/%{name}/%{name}-libde265.so
-%endif
 %{_libdir}/%{name}/%{name}-rav1e.so
 %ifarch x86_64
 %{_libdir}/%{name}/%{name}-svtenc.so
 %endif
-%if 0%{?dynamic_plugins:1}
 %{_libdir}/%{name}/%{name}-x265.so
-%endif
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 %{_datadir}/mime/packages/avif.xml
 %{_datadir}/mime/packages/heif.xml
@@ -108,6 +109,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Fri Jan 20 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-3.20230119git96a114f
+- Rebase to latest snapshot, dynamic plugin linking is fixed.
+
 * Fri Jan 13 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-2
 - Temporarily disable dynamic plugins due to a bug.
 

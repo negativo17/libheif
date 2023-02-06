@@ -1,11 +1,11 @@
-%global commit0 96a114f7e1e49d1a6f07dea0f249d260fb5d4294
-%global date 20230119
+%global commit0 03158c13aa2fa9e8d3c96ced6dcff61b86418d20
+%global date 20230203
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 #global tag %{version}
 
 Name:       libheif
 Version:    1.14.2
-Release:    4%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Release:    5%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -14,8 +14,6 @@ URL:        https://github.com/strukturag/%{name}
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %else
 Source0:    %{url}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
-Patch0:     %{url}/commit/b6812284a2d70f29a5121ec3dbe652da07fdbbb7.patch
-Patch1:     %{url}/commit/2ca02a128b2f76f7f293aa86a2ce1e04a8306c65.patch
 %endif
 
 BuildRequires:  cmake
@@ -111,6 +109,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Mon Feb 06 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-5.20230203git03158c1
+- Update to latest snapshot, drop merged patches.
+
 * Fri Jan 20 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-4.20230119git96a114f
 - Enable SVT-AV1 encoder.
 

@@ -1,11 +1,11 @@
 %global commit0 03158c13aa2fa9e8d3c96ced6dcff61b86418d20
 %global date 20230203
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-#global tag %{version}
+%global tag %{version}
 
 Name:       libheif
-Version:    1.14.2
-Release:    5%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Version:    1.15.1
+Release:    1%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -30,8 +30,6 @@ BuildRequires:  pkgconfig(rav1e)
 BuildRequires:  pkgconfig(SvtAv1Enc)
 %endif
 BuildRequires:  pkgconfig(x265)
-
-Requires:   shared-mime-info
 
 %description
 libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format) file
@@ -94,8 +92,6 @@ developing applications that use %{name}.
 %endif
 %{_libdir}/%{name}/%{name}-x265.so
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
-%{_datadir}/mime/packages/avif.xml
-%{_datadir}/mime/packages/heif.xml
 %{_datadir}/thumbnailers/
 %{_mandir}/man1/heif-convert.1*
 %{_mandir}/man1/heif-enc.1*
@@ -109,6 +105,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Fri Feb 24 2023 Simone Caronni <negativo17@gmail.com> - 1.15.1-1
+- Update to 1.15.1.
+
 * Mon Feb 06 2023 Simone Caronni <negativo17@gmail.com> - 1.14.2-5.20230203git03158c1
 - Update to latest snapshot, drop merged patches.
 

@@ -4,8 +4,8 @@
 %global tag %{version}
 
 Name:       libheif
-Version:    1.15.1
-Release:    2%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Version:    1.15.2
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -105,6 +105,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Mon May 01 2023 Simone Caronni <negativo17@gmail.com> - 1.15.2-1
+- Update to 1.15.2.
+
 * Tue Mar 14 2023 Simone Caronni <negativo17@gmail.com> - 1.15.1-2
 - Rebuild for updated dependencies.
 

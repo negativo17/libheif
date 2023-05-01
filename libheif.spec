@@ -4,6 +4,7 @@
 %global tag %{version}
 
 Name:       libheif
+Epoch:      1
 Version:    1.15.2
 Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
@@ -40,7 +41,7 @@ coding, respectively, for the best compression ratios currently possible.
 
 %package    devel
 Summary:    Development files for %{name}
-Requires:   %{name}%{?_isa} = %{version}-%{release}
+Requires:   %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
@@ -107,6 +108,7 @@ developing applications that use %{name}.
 %changelog
 * Mon May 01 2023 Simone Caronni <negativo17@gmail.com> - 1.15.2-1
 - Update to 1.15.2.
+- Bump Epoch to override Fedora package.
 
 * Tue Mar 14 2023 Simone Caronni <negativo17@gmail.com> - 1.15.1-2
 - Rebuild for updated dependencies.

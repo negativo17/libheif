@@ -5,8 +5,8 @@
 
 Name:       libheif
 Epoch:      1
-Version:    1.16.2
-Release:    2%{?dist}
+Version:    1.17.0
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -19,13 +19,17 @@ Source0:    %{url}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
+BuildRequires:  libavcodec-devel
 BuildRequires:  ninja-build
+BuildRequires:  openjpeg2-devel
 BuildRequires:  pkgconfig(aom)
 BuildRequires:  pkgconfig(dav1d)
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+BuildRequires:  pkgconfig(kvazaar)
 BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
+BuildRequires:  pkgconfig(libsharpyuv)
 BuildRequires:  pkgconfig(rav1e)
 %ifarch x86_64
 BuildRequires:  pkgconfig(SvtAv1Enc)
@@ -59,14 +63,32 @@ developing applications that use %{name}.
  -GNinja \
  -DBUILD_SHARED_LIBS=ON \
  -DENABLE_PLUGIN_LOADING=ON \
+ -DWITH_AOM_DECODER=ON \
  -DWITH_AOM_DECODER_PLUGIN=ON \
+ -DWITH_AOM_ENCODER=ON \
  -DWITH_AOM_ENCODER_PLUGIN=ON \
+ -DWITH_DAV1D=ON \
  -DWITH_DAV1D_PLUGIN=ON \
+ -DWITH_FFMPEG_DECODER=ON \
+ -DWITH_FFMPEG_DECODER_PLUGIN=ON \
+ -DWITH_KVAZAAR=ON \
+ -DWITH_KVAZAAR_PLUGIN=ON \
+ -DWITH_JPEG_DECODER=ON \
+ -DWITH_JPEG_DECODER_PLUGIN=ON \
+ -DWITH_JPEG_ENCODER=ON \
+ -DWITH_JPEG_ENCODER_PLUGIN=ON \
+ -DWITH_LIBDE265=ON \
  -DWITH_LIBDE265_PLUGIN=ON \
+ -DWITH_LIBSHARPYUV=ON \
+ -DWITH_OpenJPEG_ENCODER=ON \
+ -DWITH_OpenJPEG_DECODER=ON \
 %ifarch x86_64
+ -DWITH_SvtEnc=ON \
  -DWITH_SvtEnc_PLUGIN=ON \
 %endif
+ -DWITH_RAV1E=ON \
  -DWITH_RAV1E_PLUGIN=ON \
+ -DWITH_X265=ON \
  -DWITH_X265_PLUGIN=ON
 
 %cmake_build
@@ -86,6 +108,12 @@ developing applications that use %{name}.
 %{_libdir}/%{name}/%{name}-aomdec.so
 %{_libdir}/%{name}/%{name}-aomenc.so
 %{_libdir}/%{name}/%{name}-dav1d.so
+%{_libdir}/%{name}/%{name}-ffmpegdec.so
+%{_libdir}/%{name}/%{name}-j2kdec.so
+%{_libdir}/%{name}/%{name}-j2kenc.so
+%{_libdir}/%{name}/%{name}-jpegdec.so
+%{_libdir}/%{name}/%{name}-jpegenc.so
+%{_libdir}/%{name}/%{name}-kvazaar.so
 %{_libdir}/%{name}/%{name}-libde265.so
 %{_libdir}/%{name}/%{name}-rav1e.so
 %ifarch x86_64
@@ -106,6 +134,10 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Tue Oct 17 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.0-1
+- Update to 1.17.0.
+- Enable libsharpyuv and all new plugins.
+
 * Fri Jun 02 2023 Simone Caronni <negativo17@gmail.com> - 1:1.16.2-2
 - Rebuild for updated dependencies.
 

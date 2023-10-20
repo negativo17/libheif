@@ -5,7 +5,7 @@
 
 Name:       libheif
 Epoch:      1
-Version:    1.17.0
+Version:    1.17.1
 Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
@@ -134,6 +134,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Fri Oct 20 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.1-1
+- Update to 1.17.1.
+
 * Tue Oct 17 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.0-1
 - Update to 1.17.0.
 - Enable libsharpyuv and all new plugins.

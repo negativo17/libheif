@@ -5,7 +5,7 @@
 
 Name:       libheif
 Epoch:      1
-Version:    1.17.3
+Version:    1.17.4
 Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
@@ -121,7 +121,6 @@ developing applications that use %{name}.
 %endif
 %{_libdir}/%{name}/%{name}-x265.so
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
-%{_datadir}/thumbnailers/
 %{_mandir}/man1/heif-convert.1*
 %{_mandir}/man1/heif-enc.1*
 %{_mandir}/man1/heif-info.1*
@@ -134,6 +133,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Tue Nov 21 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.4-1
+- Update to 1.17.4.
+
 * Fri Nov 10 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.3-1
 - Update to 1.17.3.
 

@@ -5,7 +5,7 @@
 
 Name:       libheif
 Epoch:      1
-Version:    1.17.4
+Version:    1.17.5
 Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
@@ -69,6 +69,7 @@ developing applications that use %{name}.
  -DWITH_AOM_ENCODER_PLUGIN=ON \
  -DWITH_DAV1D=ON \
  -DWITH_DAV1D_PLUGIN=ON \
+ -DWITH_EXAMPLES=ON \
  -DWITH_FFMPEG_DECODER=ON \
  -DWITH_FFMPEG_DECODER_PLUGIN=ON \
  -DWITH_KVAZAAR=ON \
@@ -103,6 +104,7 @@ developing applications that use %{name}.
 %{_bindir}/heif-enc
 %{_bindir}/heif-info
 %{_bindir}/heif-thumbnailer
+%{_datadir}/thumbnailers/
 %{_libdir}/%{name}.so.1
 %{_libdir}/%{name}.so.%{version}
 %{_libdir}/%{name}/%{name}-aomdec.so
@@ -133,6 +135,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Tue Nov 21 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.5-1
+- Update to 1.17.5.
+
 * Tue Nov 21 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.4-1
 - Update to 1.17.4.
 

@@ -1,12 +1,12 @@
-%global commit0 03158c13aa2fa9e8d3c96ced6dcff61b86418d20
-%global date 20230203
+%global commit0 f0c1a863cabbccb2d280515b7ecc73e6717702dc
+%global date 20240525
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global tag %{version}
+#global tag %{version}
 
 Name:       libheif
 Epoch:      1
 Version:    1.17.6
-Release:    1%{?dist}
+Release:    2%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -31,9 +31,7 @@ BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
 BuildRequires:  pkgconfig(rav1e)
-%ifarch x86_64
 BuildRequires:  pkgconfig(SvtAv1Enc)
-%endif
 BuildRequires:  pkgconfig(x265)
 
 %description
@@ -60,37 +58,40 @@ developing applications that use %{name}.
 
 %build
 %cmake \
- -GNinja \
- -DBUILD_SHARED_LIBS=ON \
- -DENABLE_PLUGIN_LOADING=ON \
- -DWITH_AOM_DECODER=ON \
- -DWITH_AOM_DECODER_PLUGIN=ON \
- -DWITH_AOM_ENCODER=ON \
- -DWITH_AOM_ENCODER_PLUGIN=ON \
- -DWITH_DAV1D=ON \
- -DWITH_DAV1D_PLUGIN=ON \
- -DWITH_EXAMPLES=ON \
- -DWITH_FFMPEG_DECODER=ON \
- -DWITH_FFMPEG_DECODER_PLUGIN=ON \
- -DWITH_KVAZAAR=ON \
- -DWITH_KVAZAAR_PLUGIN=ON \
- -DWITH_JPEG_DECODER=ON \
- -DWITH_JPEG_DECODER_PLUGIN=ON \
- -DWITH_JPEG_ENCODER=ON \
- -DWITH_JPEG_ENCODER_PLUGIN=ON \
- -DWITH_LIBDE265=ON \
- -DWITH_LIBDE265_PLUGIN=ON \
- -DWITH_LIBSHARPYUV=ON \
- -DWITH_OpenJPEG_ENCODER=ON \
- -DWITH_OpenJPEG_DECODER=ON \
-%ifarch x86_64
- -DWITH_SvtEnc=ON \
- -DWITH_SvtEnc_PLUGIN=ON \
-%endif
- -DWITH_RAV1E=ON \
- -DWITH_RAV1E_PLUGIN=ON \
- -DWITH_X265=ON \
- -DWITH_X265_PLUGIN=ON
+  -GNinja \
+  -DBUILD_SHARED_LIBS=ON \
+  -DENABLE_PLUGIN_LOADING=ON \
+  -DWITH_AOM_DECODER=ON \
+  -DWITH_AOM_DECODER_PLUGIN=ON \
+  -DWITH_AOM_ENCODER=ON \
+  -DWITH_AOM_ENCODER_PLUGIN=ON \
+  -DWITH_DAV1D=ON \
+  -DWITH_DAV1D_PLUGIN=ON \
+  -DWITH_DEFLATE_HEADER_COMPRESSION=ON \
+  -DWITH_EXAMPLES=ON \
+  -DWITH_FFMPEG_DECODER=ON \
+  -DWITH_FFMPEG_DECODER_PLUGIN=ON \
+  -DWITH_KVAZAAR=ON \
+  -DWITH_KVAZAAR_PLUGIN=ON \
+  -DWITH_JPEG_DECODER=ON \
+  -DWITH_JPEG_DECODER_PLUGIN=ON \
+  -DWITH_JPEG_ENCODER=ON \
+  -DWITH_JPEG_ENCODER_PLUGIN=ON \
+  -DWITH_LIBDE265=ON \
+  -DWITH_LIBDE265_PLUGIN=ON \
+  -DWITH_LIBSHARPYUV=ON \
+  -DWITH_OpenJPEG_ENCODER=ON \
+  -DWITH_OpenJPEG_ENCODER_PLUGIN=ON \
+  -DWITH_OpenJPEG_DECODER=ON \
+  -DWITH_OpenJPEG_DECODER_PLUGIN=ON \
+  -DWITH_SvtEnc=ON \
+  -DWITH_SvtEnc_PLUGIN=ON \
+  -DWITH_RAV1E=ON \
+  -DWITH_RAV1E_PLUGIN=ON \
+  -DWITH_REDUCED_VISIBILITY=ON \
+  -DWITH_UNCOMPRESSED_CODEC=ON \
+  -DWITH_X265=ON \
+  -DWITH_X265_PLUGIN=ON
 
 %cmake_build
 
@@ -118,9 +119,7 @@ developing applications that use %{name}.
 %{_libdir}/%{name}/%{name}-kvazaar.so
 %{_libdir}/%{name}/%{name}-libde265.so
 %{_libdir}/%{name}/%{name}-rav1e.so
-%ifarch x86_64
 %{_libdir}/%{name}/%{name}-svtenc.so
-%endif
 %{_libdir}/%{name}/%{name}-x265.so
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 %{_mandir}/man1/heif-convert.1*
@@ -135,6 +134,10 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Tue Jun 04 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-2.20240525gitf0c1a86
+- Update to latest snapshot to fix memory leaks and allow building with SVT-AV1 2.x.
+- Adjust plugins and build options, enable SVT-AV1 for aarch64.
+
 * Thu Dec 21 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-1
 - Update to 1.17.6.
 

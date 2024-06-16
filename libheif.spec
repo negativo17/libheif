@@ -1,12 +1,12 @@
-%global commit0 f0c1a863cabbccb2d280515b7ecc73e6717702dc
-%global date 20240525
+%global commit0 77e9adb9af8ac69e89eb44089151c11726a56f62
+%global date 20240612
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 #global tag %{version}
 
 Name:       libheif
 Epoch:      1
 Version:    1.17.6
-Release:    2%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Release:    3%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -134,6 +134,9 @@ developing applications that use %{name}.
 %{_libdir}/%{name}.so
 
 %changelog
+* Sun Jun 16 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-3.20240612git77e9adb
+- Update to latest snapshot.
+
 * Tue Jun 04 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-2.20240525gitf0c1a86
 - Update to latest snapshot to fix memory leaks and allow building with SVT-AV1 2.x.
 - Adjust plugins and build options, enable SVT-AV1 for aarch64.

@@ -18,6 +18,7 @@ Source0:    %{url}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
 %endif
 
 BuildRequires:  cmake
+BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  libavcodec-devel
 BuildRequires:  ninja-build
@@ -98,6 +99,9 @@ developing applications that use %{name}.
 %install
 %cmake_install
 
+cp -frv %{_vpath_builddir}/apidoc/man/man3 %{buildroot}%{_mandir}/
+rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
+
 %files
 %license COPYING
 %doc README.md
@@ -128,14 +132,31 @@ developing applications that use %{name}.
 %{_mandir}/man1/heif-thumbnailer.1*
 
 %files devel
+%doc %{_vpath_builddir}/apidoc/html
 %{_includedir}/%{name}/
 %{_libdir}/cmake/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/%{name}.so
+%{_mandir}/man3/heif.h.3*
+%{_mandir}/man3/heif_regions.h.3*
+%{_mandir}/man3/heif_color_conversion_options.3*
+%{_mandir}/man3/heif_color_profile_nclx.3*
+%{_mandir}/man3/heif_content_light_level.3*
+%{_mandir}/man3/heif_decoded_mastering_display_colour_volume.3*
+%{_mandir}/man3/heif_decoding_options.3*
+%{_mandir}/man3/heif_depth_representation_info.3*
+%{_mandir}/man3/heif_encoding_options.3*
+%{_mandir}/man3/heif_error.3*
+%{_mandir}/man3/heif_init_params.3*
+%{_mandir}/man3/heif_mastering_display_colour_volume.3*
+%{_mandir}/man3/heif_plugin_info.3*
+%{_mandir}/man3/heif_reader.3*
+%{_mandir}/man3/heif_writer.3*
 
 %changelog
 * Sun Jun 16 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-3.20240612git77e9adb
 - Update to latest snapshot.
+- Enable development documentation.
 
 * Tue Jun 04 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-2.20240525gitf0c1a86
 - Update to latest snapshot to fix memory leaks and allow building with SVT-AV1 2.x.

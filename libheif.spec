@@ -1,23 +1,15 @@
-%global commit0 03158c13aa2fa9e8d3c96ced6dcff61b86418d20
-%global date 20230203
-%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global tag %{version}
-
 Name:       libheif
 Epoch:      1
 Version:    1.17.6
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
 
-%if 0%{?tag:1}
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-%else
-Source0:    %{url}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
-%endif
 
 BuildRequires:  cmake
+BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  libavcodec-devel
 BuildRequires:  ninja-build
@@ -52,11 +44,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%if 0%{?tag:1}
 %autosetup -p1
-%else
-%autosetup -p1 -n %{name}-%{commit0}
-%endif
 
 %build
 %cmake \
@@ -97,6 +85,9 @@ developing applications that use %{name}.
 %install
 %cmake_install
 
+cp -frv %{_vpath_builddir}/apidoc/man/man3 %{buildroot}%{_mandir}/
+rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
+
 %files
 %license COPYING
 %doc README.md
@@ -129,12 +120,31 @@ developing applications that use %{name}.
 %{_mandir}/man1/heif-thumbnailer.1*
 
 %files devel
+%doc %{_vpath_builddir}/apidoc/html
 %{_includedir}/%{name}/
 %{_libdir}/cmake/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/%{name}.so
+%{_mandir}/man3/heif.h.3*
+%{_mandir}/man3/heif_regions.h.3*
+%{_mandir}/man3/heif_color_conversion_options.3*
+%{_mandir}/man3/heif_color_profile_nclx.3*
+%{_mandir}/man3/heif_content_light_level.3*
+%{_mandir}/man3/heif_decoded_mastering_display_colour_volume.3*
+%{_mandir}/man3/heif_decoding_options.3*
+%{_mandir}/man3/heif_depth_representation_info.3*
+%{_mandir}/man3/heif_encoding_options.3*
+%{_mandir}/man3/heif_error.3*
+%{_mandir}/man3/heif_init_params.3*
+%{_mandir}/man3/heif_mastering_display_colour_volume.3*
+%{_mandir}/man3/heif_plugin_info.3*
+%{_mandir}/man3/heif_reader.3*
+%{_mandir}/man3/heif_writer.3*
 
 %changelog
+* Mon Jun 17 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-2
+- Enable developer documentation.
+
 * Thu Dec 21 2023 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-1
 - Update to 1.17.6.
 

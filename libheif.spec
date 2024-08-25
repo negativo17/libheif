@@ -1,12 +1,12 @@
 %global commit0 77e9adb9af8ac69e89eb44089151c11726a56f62
 %global date 20240612
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-#global tag %{version}
+%global tag %{version}
 
 Name:       libheif
 Epoch:      1
-Version:    1.17.6
-Release:    3%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Version:    1.18.2
+Release:    1%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -31,9 +31,14 @@ BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
+BuildRequires:  pkgconfig(openjph)
+BuildRequires:  pkgconfig(libvvdec)
+BuildRequires:  pkgconfig(libvvenc)
 BuildRequires:  pkgconfig(rav1e)
 BuildRequires:  pkgconfig(SvtAv1Enc)
+BuildRequires:  pkgconfig(uvg266)
 BuildRequires:  pkgconfig(x265)
+BuildRequires:  vvdec
 
 %description
 libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format) file
@@ -49,6 +54,14 @@ Requires:   %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
+
+%package -n     heif-pixbuf-loader
+Summary:        HEIF image loader for GTK+ applications
+BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+Requires:       gdk-pixbuf2%{?_isa}
+
+%description -n heif-pixbuf-loader
+This package provides a plugin to load HEIF files in GTK+ applications.
 
 %prep
 %if 0%{?tag:1}
@@ -81,16 +94,25 @@ developing applications that use %{name}.
   -DWITH_LIBDE265=ON \
   -DWITH_LIBDE265_PLUGIN=ON \
   -DWITH_LIBSHARPYUV=ON \
+  -DWITH_LIBSHARPYUV_PLUGIN=ON \
   -DWITH_OpenJPEG_ENCODER=ON \
   -DWITH_OpenJPEG_ENCODER_PLUGIN=ON \
   -DWITH_OpenJPEG_DECODER=ON \
   -DWITH_OpenJPEG_DECODER_PLUGIN=ON \
+  -DWITH_OPENJPH_ENCODER=ON \
+  -DWITH_OPENJPH_ENCODER_PLUGIN=ON \
   -DWITH_SvtEnc=ON \
   -DWITH_SvtEnc_PLUGIN=ON \
   -DWITH_RAV1E=ON \
   -DWITH_RAV1E_PLUGIN=ON \
   -DWITH_REDUCED_VISIBILITY=ON \
   -DWITH_UNCOMPRESSED_CODEC=ON \
+  -DWITH_UVG266=ON \
+  -DWITH_UVG266_PLUGIN=ON \
+  -DWITH_VVDEC=ON \
+  -DWITH_VVDEC_PLUGIN=ON \
+  -DWITH_VVENC=ON \
+  -DWITH_VVENC_PLUGIN=ON \
   -DWITH_X265=ON \
   -DWITH_X265_PLUGIN=ON
 
@@ -106,6 +128,7 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %license COPYING
 %doc README.md
 %{_bindir}/heif-convert
+%{_bindir}/heif-dec
 %{_bindir}/heif-enc
 %{_bindir}/heif-info
 %{_bindir}/heif-thumbnailer
@@ -120,13 +143,16 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}/%{name}-j2kenc.so
 %{_libdir}/%{name}/%{name}-jpegdec.so
 %{_libdir}/%{name}/%{name}-jpegenc.so
+%{_libdir}/%{name}/%{name}-jphenc.so
 %{_libdir}/%{name}/%{name}-kvazaar.so
 %{_libdir}/%{name}/%{name}-libde265.so
 %{_libdir}/%{name}/%{name}-rav1e.so
 %{_libdir}/%{name}/%{name}-svtenc.so
+%{_libdir}/%{name}/%{name}-uvg266.so
+%{_libdir}/%{name}/%{name}-vvdec.so
+%{_libdir}/%{name}/%{name}-vvenc.so
 %{_libdir}/%{name}/%{name}-x265.so
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
-%{_mandir}/man1/heif-convert.1*
+%{_mandir}/man1/heif-dec.1*
 %{_mandir}/man1/heif-enc.1*
 %{_mandir}/man1/heif-info.1*
 %{_mandir}/man1/heif-thumbnailer.1*
@@ -139,6 +165,7 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}.so
 %{_mandir}/man3/heif.h.3*
 %{_mandir}/man3/heif_regions.h.3*
+%{_mandir}/man3/heif_camera_intrinsic_matrix.3.gz
 %{_mandir}/man3/heif_color_conversion_options.3*
 %{_mandir}/man3/heif_color_profile_nclx.3*
 %{_mandir}/man3/heif_content_light_level.3*
@@ -148,12 +175,21 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_mandir}/man3/heif_encoding_options.3*
 %{_mandir}/man3/heif_error.3*
 %{_mandir}/man3/heif_init_params.3*
+%{_mandir}/man3/heif_items.h.3.gz
 %{_mandir}/man3/heif_mastering_display_colour_volume.3*
 %{_mandir}/man3/heif_plugin_info.3*
 %{_mandir}/man3/heif_reader.3*
 %{_mandir}/man3/heif_writer.3*
 
+%files -n heif-pixbuf-loader
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
+
 %changelog
+* Thu Aug 22 2024 Simone Caronni <negativo17@gmail.com> - 1:1.18.2-1
+- Update to 1.18.2.
+- Enable VVdec/VVenc/uvg266/OpenJPH plugins.
+- Split GTK loader in a separate subpackage.
+
 * Sun Jun 16 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-3.20240612git77e9adb
 - Update to latest snapshot.
 - Enable development documentation.

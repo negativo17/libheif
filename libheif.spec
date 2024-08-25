@@ -1,7 +1,7 @@
 Name:       libheif
 Epoch:      1
 Version:    1.17.6
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -23,9 +23,7 @@ BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
 BuildRequires:  pkgconfig(rav1e)
-%ifarch x86_64
 BuildRequires:  pkgconfig(SvtAv1Enc)
-%endif
 BuildRequires:  pkgconfig(x265)
 
 %description
@@ -42,6 +40,14 @@ Requires:   %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
+
+%package -n     heif-pixbuf-loader
+Summary:        HEIF image loader for GTK+ applications
+BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+Requires:       gdk-pixbuf2%{?_isa}
+
+%description -n heif-pixbuf-loader
+This package provides a plugin to load HEIF files in GTK+ applications.
 
 %prep
 %autosetup -p1
@@ -71,10 +77,8 @@ developing applications that use %{name}.
   -DWITH_LIBSHARPYUV=ON \
   -DWITH_OpenJPEG_ENCODER=ON \
   -DWITH_OpenJPEG_DECODER=ON \
-%ifarch x86_64
   -DWITH_SvtEnc=ON \
   -DWITH_SvtEnc_PLUGIN=ON \
-%endif
   -DWITH_RAV1E=ON \
   -DWITH_RAV1E_PLUGIN=ON \
   -DWITH_X265=ON \
@@ -109,11 +113,8 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}/%{name}-kvazaar.so
 %{_libdir}/%{name}/%{name}-libde265.so
 %{_libdir}/%{name}/%{name}-rav1e.so
-%ifarch x86_64
 %{_libdir}/%{name}/%{name}-svtenc.so
-%endif
 %{_libdir}/%{name}/%{name}-x265.so
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 %{_mandir}/man1/heif-convert.1*
 %{_mandir}/man1/heif-enc.1*
 %{_mandir}/man1/heif-info.1*
@@ -141,7 +142,14 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_mandir}/man3/heif_reader.3*
 %{_mandir}/man3/heif_writer.3*
 
+%files -n heif-pixbuf-loader
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
+
 %changelog
+* Sun Aug 25 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-3
+- Split GTK loader in a separate subpackage.
+- Enable SVT-AV1 for aarch64.
+
 * Mon Jun 17 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-2
 - Enable developer documentation.
 

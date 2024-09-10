@@ -5,8 +5,8 @@
 
 Name:       libheif
 Epoch:      1
-Version:    1.18.2
-Release:    2%{!?tag:.%{date}git%{shortcommit0}}%{?dist}
+Version:    1.18.2%{!?tag:^%{date}git%{shortcommit0}}
+Release:    2%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -186,7 +186,8 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 
 %changelog
 * Tue Sep 10 2024 Simone Caronni <negativo17@gmail.com> - 1:1.18.2-2
-- Rebuild for updated depdendncies.
+- Rebuild for updated depdendencies.
+- Adjust snapshot version to recent packaging guidelines.
 
 * Thu Aug 22 2024 Simone Caronni <negativo17@gmail.com> - 1:1.18.2-1
 - Update to 1.18.2.

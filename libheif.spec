@@ -5,8 +5,8 @@
 
 Name:       libheif
 Epoch:      1
-Version:    1.18.2%{!?tag:^%{date}git%{shortcommit0}}
-Release:    5%{?dist}
+Version:    1.19.3%{!?tag:^%{date}git%{shortcommit0}}
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -31,9 +31,10 @@ BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
-BuildRequires:  pkgconfig(openjph)
 BuildRequires:  pkgconfig(libvvdec)
 BuildRequires:  pkgconfig(libvvenc)
+BuildRequires:  pkgconfig(openh264)
+BuildRequires:  pkgconfig(openjph) >= 0.18.0
 BuildRequires:  pkgconfig(rav1e)
 BuildRequires:  pkgconfig(SvtAv1Enc)
 BuildRequires:  pkgconfig(uvg266)
@@ -74,6 +75,7 @@ This package provides a plugin to load HEIF files in GTK+ applications.
 %cmake \
   -GNinja \
   -DBUILD_SHARED_LIBS=ON \
+  -DCMAKE_COMPILE_WARNING_AS_ERROR=OFF \
   -DENABLE_PLUGIN_LOADING=ON \
   -DWITH_AOM_DECODER=ON \
   -DWITH_AOM_DECODER_PLUGIN=ON \
@@ -95,6 +97,8 @@ This package provides a plugin to load HEIF files in GTK+ applications.
   -DWITH_LIBDE265_PLUGIN=ON \
   -DWITH_LIBSHARPYUV=ON \
   -DWITH_LIBSHARPYUV_PLUGIN=ON \
+  -DWITH_OpenH264_DECODER=ON \
+  -DWITH_OpenH264_DECODER_PLUGIN=ON \
   -DWITH_OpenJPEG_ENCODER=ON \
   -DWITH_OpenJPEG_ENCODER_PLUGIN=ON \
   -DWITH_OpenJPEG_DECODER=ON \
@@ -146,6 +150,7 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}/%{name}-jphenc.so
 %{_libdir}/%{name}/%{name}-kvazaar.so
 %{_libdir}/%{name}/%{name}-libde265.so
+%{_libdir}/%{name}/%{name}-openh264dec.so
 %{_libdir}/%{name}/%{name}-rav1e.so
 %{_libdir}/%{name}/%{name}-svtenc.so
 %{_libdir}/%{name}/%{name}-uvg266.so
@@ -164,7 +169,7 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/%{name}.so
 %{_mandir}/man3/heif.h.3*
-%{_mandir}/man3/heif_regions.h.3*
+%{_mandir}/man3/heif_ambient_viewing_environment.3.gz
 %{_mandir}/man3/heif_camera_intrinsic_matrix.3.gz
 %{_mandir}/man3/heif_color_conversion_options.3*
 %{_mandir}/man3/heif_color_profile_nclx.3*
@@ -173,18 +178,30 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_mandir}/man3/heif_decoding_options.3*
 %{_mandir}/man3/heif_depth_representation_info.3*
 %{_mandir}/man3/heif_encoding_options.3*
+%{_mandir}/man3/heif_entity_group.3*
 %{_mandir}/man3/heif_error.3*
+%{_mandir}/man3/heif_image_tiling.3*
 %{_mandir}/man3/heif_init_params.3*
-%{_mandir}/man3/heif_items.h.3.gz
+%{_mandir}/man3/heif_items.h.3*
 %{_mandir}/man3/heif_mastering_display_colour_volume.3*
 %{_mandir}/man3/heif_plugin_info.3*
 %{_mandir}/man3/heif_reader.3*
+%{_mandir}/man3/heif_reader_range_request_result.3*
+%{_mandir}/man3/heif_regions.h.3*
+%{_mandir}/man3/heif_security_limits.3*
 %{_mandir}/man3/heif_writer.3*
 
 %files -n heif-pixbuf-loader
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 
 %changelog
+* Tue Nov 12 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.3-1
+- Update to 1.19.3.
+- Fix build on Fedora:
+  https://github.com/strukturag/libheif/issues/1360#issuecomment-2452007818
+- Enable OpenH264 decoding.
+- Re-enable OpenJPH (0.18.0).
+
 * Wed Dec 04 2024 Simone Caronni <negativo17@gmail.com> - 1:1.18.2-5
 - Rebuilt for updated dependencies.
 

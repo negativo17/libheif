@@ -6,7 +6,7 @@
 Name:       libheif
 Epoch:      1
 Version:    1.18.2%{!?tag:^%{date}git%{shortcommit0}}
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -31,7 +31,7 @@ BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
-#BuildRequires:  pkgconfig(openjph)
+BuildRequires:  pkgconfig(openjph)
 BuildRequires:  pkgconfig(libvvdec)
 BuildRequires:  pkgconfig(libvvenc)
 BuildRequires:  pkgconfig(rav1e)
@@ -99,8 +99,8 @@ This package provides a plugin to load HEIF files in GTK+ applications.
   -DWITH_OpenJPEG_ENCODER_PLUGIN=ON \
   -DWITH_OpenJPEG_DECODER=ON \
   -DWITH_OpenJPEG_DECODER_PLUGIN=ON \
-  -DWITH_OPENJPH_ENCODER=OFF \
-  -DWITH_OPENJPH_ENCODER_PLUGIN=OFF \
+  -DWITH_OPENJPH_ENCODER=ON \
+  -DWITH_OPENJPH_ENCODER_PLUGIN=ON \
   -DWITH_SvtEnc=ON \
   -DWITH_SvtEnc_PLUGIN=ON \
   -DWITH_RAV1E=ON \
@@ -143,7 +143,7 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}/%{name}-j2kenc.so
 %{_libdir}/%{name}/%{name}-jpegdec.so
 %{_libdir}/%{name}/%{name}-jpegenc.so
-#%{_libdir}/%{name}/%{name}-jphenc.so
+%{_libdir}/%{name}/%{name}-jphenc.so
 %{_libdir}/%{name}/%{name}-kvazaar.so
 %{_libdir}/%{name}/%{name}-libde265.so
 %{_libdir}/%{name}/%{name}-rav1e.so
@@ -185,6 +185,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 
 %changelog
+* Tue Nov 12 2024 Simone Caronni <negativo17@gmail.com> - 1:1.18.2-4
+- Re-enable OpenJPH.
+
 * Thu Sep 12 2024 Simone Caronni <negativo17@gmail.com> - 1:1.18.2-3
 - Momentarily disable OpenJPH plugin.
 

@@ -6,7 +6,7 @@
 Name:       libheif
 Epoch:      1
 Version:    1.19.3%{!?tag:^%{date}git%{shortcommit0}}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -195,6 +195,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 
 %changelog
+* Thu Nov 21 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.3-2
+- Update to 1.19.5.
+
 * Tue Nov 12 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.3-1
 - Update to 1.19.3.
 - Fix build on Fedora:

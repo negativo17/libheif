@@ -1,21 +1,12 @@
-%global commit0 77e9adb9af8ac69e89eb44089151c11726a56f62
-%global date 20240612
-%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global tag %{version}
-
 Name:       libheif
 Epoch:      1
-Version:    1.19.3%{!?tag:^%{date}git%{shortcommit0}}
+Version:    1.19.5
 Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
 
-%if 0%{?tag:1}
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-%else
-Source0:    %{url}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
-%endif
 
 BuildRequires:  cmake
 BuildRequires:  doxygen
@@ -65,11 +56,7 @@ Requires:       gdk-pixbuf2%{?_isa}
 This package provides a plugin to load HEIF files in GTK+ applications.
 
 %prep
-%if 0%{?tag:1}
 %autosetup -p1
-%else
-%autosetup -p1 -n %{name}-%{commit0}
-%endif
 
 %build
 %cmake \
@@ -195,6 +182,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 
 %changelog
+* Thu Nov 21 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.5-1
+- Update to 1.19.5.
+
 * Tue Nov 12 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.3-1
 - Update to 1.19.3.
 - Fix build on Fedora:

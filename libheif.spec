@@ -1,12 +1,13 @@
 Name:       libheif
 Epoch:      1
 Version:    1.19.7
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
 
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:     %{name}-vvdec3.patch
 
 BuildRequires:  cmake
 BuildRequires:  doxygen
@@ -22,15 +23,17 @@ BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
-BuildRequires:  pkgconfig(libvvdec)
-BuildRequires:  pkgconfig(libvvenc)
+BuildRequires:  pkgconfig(libvvdec) >= 3.0.0
+BuildRequires:  pkgconfig(libvvenc) >= 1.12.0
 BuildRequires:  pkgconfig(openh264)
 BuildRequires:  pkgconfig(openjph) >= 0.18.0
 BuildRequires:  pkgconfig(rav1e)
 BuildRequires:  pkgconfig(SvtAv1Enc)
 BuildRequires:  pkgconfig(uvg266)
 BuildRequires:  pkgconfig(x265)
+# Requires the "vvdecapp" and "vvencapp" binaries:
 BuildRequires:  vvdec
+BuildRequires:  vvenc
 
 %description
 libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format) file
@@ -62,6 +65,7 @@ This package provides a plugin to load HEIF files in GTK+ applications.
 %cmake \
   -GNinja \
   -DBUILD_SHARED_LIBS=ON \
+  -DBUILD_TESTING=ON \
   -DCMAKE_COMPILE_WARNING_AS_ERROR=OFF \
   -DENABLE_PLUGIN_LOADING=ON \
   -DWITH_AOM_DECODER=ON \
@@ -114,6 +118,9 @@ This package provides a plugin to load HEIF files in GTK+ applications.
 
 cp -frv %{_vpath_builddir}/apidoc/man/man3 %{buildroot}%{_mandir}/
 rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
+
+%check
+%ctest
 
 %files
 %license COPYING
@@ -182,13 +189,18 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 
 %changelog
+* Tue Mar 25 2025 Simone Caronni <negativo17@gmail.com> - 1:1.19.7-2
+- Update VVdeC/VVenC requirements.
+- Enable testing.
+- Fix changelog.
+
 * Mon Mar 17 2025 Simone Caronni <negativo17@gmail.com> - 1:1.19.7-1
 - Update to 1.19.7.
 
-* Thu Nov 21 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.5-1
+* Thu Dec 12 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.5-1
 - Update to 1.19.5.
 
-* Tue Nov 12 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.3-1
+* Tue Dec 10 2024 Simone Caronni <negativo17@gmail.com> - 1:1.19.3-1
 - Update to 1.19.3.
 - Fix build on Fedora:
   https://github.com/strukturag/libheif/issues/1360#issuecomment-2452007818

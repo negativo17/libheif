@@ -1,7 +1,7 @@
 Name:       libheif
 Epoch:      1
-Version:    1.19.7
-Release:    2%{?dist}
+Version:    1.19.8
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -189,6 +189,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 
 %changelog
+* Tue Apr 29 2025 Simone Caronni <negativo17@gmail.com> - 1:1.19.8-1
+- Update to 1.19.8.
+
 * Tue Mar 25 2025 Simone Caronni <negativo17@gmail.com> - 1:1.19.7-2
 - Update VVdeC/VVenC requirements.
 - Enable testing.

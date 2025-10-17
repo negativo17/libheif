@@ -1,6 +1,6 @@
 Name:       libheif
 Epoch:      1
-Version:    1.19.8
+Version:    1.20.2
 Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
@@ -23,17 +23,22 @@ BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
+BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  pkgconfig(libvvdec) >= 3.0.0
 BuildRequires:  pkgconfig(libvvenc) >= 1.12.0
 BuildRequires:  pkgconfig(openh264)
 BuildRequires:  pkgconfig(openjph) >= 0.18.0
 BuildRequires:  pkgconfig(rav1e)
+BuildRequires:  pkgconfig(sdl2)
 BuildRequires:  pkgconfig(SvtAv1Enc)
 BuildRequires:  pkgconfig(uvg266)
 BuildRequires:  pkgconfig(x265)
 # Requires the "vvdecapp" and "vvencapp" binaries:
 BuildRequires:  vvdec
 BuildRequires:  vvenc
+
+Requires:       shared-mime-info
+Obsoletes:      heif-pixbuf-loader < %{version}-%{release}
 
 %description
 libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format) file
@@ -42,6 +47,14 @@ format decoder and encoder.
 HEIF and AVIF are new image file formats employing HEVC (h.265) or AV1 image
 coding, respectively, for the best compression ratios currently possible.
 
+%package        tools
+Summary:        Tools for manipulating HEIF files
+License:        MIT
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+
+%description    tools
+This package provides tools for manipulating HEIF files.
+
 %package    devel
 Summary:    Development files for %{name}
 Requires:   %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
@@ -49,14 +62,6 @@ Requires:   %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
-%package -n     heif-pixbuf-loader
-Summary:        HEIF image loader for GTK+ applications
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
-Requires:       gdk-pixbuf2%{?_isa}
-
-%description -n heif-pixbuf-loader
-This package provides a plugin to load HEIF files in GTK+ applications.
 
 %prep
 %autosetup -p1
@@ -78,6 +83,7 @@ This package provides a plugin to load HEIF files in GTK+ applications.
   -DWITH_EXAMPLES=ON \
   -DWITH_FFMPEG_DECODER=ON \
   -DWITH_FFMPEG_DECODER_PLUGIN=ON \
+  -DWITH_GDK_PIXBUF=OFF \
   -DWITH_KVAZAAR=ON \
   -DWITH_KVAZAAR_PLUGIN=ON \
   -DWITH_JPEG_DECODER=ON \
@@ -125,11 +131,6 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %files
 %license COPYING
 %doc README.md
-%{_bindir}/heif-convert
-%{_bindir}/heif-dec
-%{_bindir}/heif-enc
-%{_bindir}/heif-info
-%{_bindir}/heif-thumbnailer
 %{_datadir}/thumbnailers/
 %{_libdir}/%{name}.so.1
 %{_libdir}/%{name}.so.%{version}
@@ -151,6 +152,14 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}/%{name}-vvdec.so
 %{_libdir}/%{name}/%{name}-vvenc.so
 %{_libdir}/%{name}/%{name}-x265.so
+
+%files tools
+%{_bindir}/heif-convert
+%{_bindir}/heif-dec
+%{_bindir}/heif-enc
+%{_bindir}/heif-info
+%{_bindir}/heif-thumbnailer
+%{_bindir}/heif-view
 %{_mandir}/man1/heif-dec.1*
 %{_mandir}/man1/heif-enc.1*
 %{_mandir}/man1/heif-info.1*
@@ -163,32 +172,14 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/%{name}.so
 %{_mandir}/man3/heif.h.3*
-%{_mandir}/man3/heif_ambient_viewing_environment.3.gz
-%{_mandir}/man3/heif_camera_intrinsic_matrix.3.gz
-%{_mandir}/man3/heif_color_conversion_options.3*
-%{_mandir}/man3/heif_color_profile_nclx.3*
-%{_mandir}/man3/heif_content_light_level.3*
-%{_mandir}/man3/heif_decoded_mastering_display_colour_volume.3*
-%{_mandir}/man3/heif_decoding_options.3*
-%{_mandir}/man3/heif_depth_representation_info.3*
-%{_mandir}/man3/heif_encoding_options.3*
-%{_mandir}/man3/heif_entity_group.3*
-%{_mandir}/man3/heif_error.3*
-%{_mandir}/man3/heif_image_tiling.3*
-%{_mandir}/man3/heif_init_params.3*
 %{_mandir}/man3/heif_items.h.3*
-%{_mandir}/man3/heif_mastering_display_colour_volume.3*
-%{_mandir}/man3/heif_plugin_info.3*
-%{_mandir}/man3/heif_reader.3*
-%{_mandir}/man3/heif_reader_range_request_result.3*
 %{_mandir}/man3/heif_regions.h.3*
-%{_mandir}/man3/heif_security_limits.3*
-%{_mandir}/man3/heif_writer.3*
-
-%files -n heif-pixbuf-loader
-%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
 
 %changelog
+* Fri Oct 17 2025 Simone Caronni <negativo17@gmail.com> - 1:1.20.2-1
+- Update to 1.20.2.
+- Remove obsolete pixbuf loader.
+
 * Tue Apr 29 2025 Simone Caronni <negativo17@gmail.com> - 1:1.19.8-1
 - Update to 1.19.8.
 

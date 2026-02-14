@@ -1,13 +1,12 @@
 Name:       libheif
 Epoch:      1
-Version:    1.20.2
-Release:    2%{?dist}
+Version:    1.21.2
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
 
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:     %{name}-vvdec3.patch
 
 BuildRequires:  cmake
 BuildRequires:  doxygen
@@ -32,6 +31,7 @@ BuildRequires:  pkgconfig(rav1e)
 BuildRequires:  pkgconfig(sdl2)
 BuildRequires:  pkgconfig(SvtAv1Enc)
 BuildRequires:  pkgconfig(uvg266)
+BuildRequires:  pkgconfig(x264)
 BuildRequires:  pkgconfig(x265)
 # Requires the "vvdecapp" and "vvencapp" binaries:
 BuildRequires:  vvdec
@@ -114,6 +114,8 @@ developing applications that use %{name}.
   -DWITH_VVDEC_PLUGIN=ON \
   -DWITH_VVENC=ON \
   -DWITH_VVENC_PLUGIN=ON \
+  -DWITH_X264=ON \
+  -DWITH_X264_PLUGIN=ON \
   -DWITH_X265=ON \
   -DWITH_X265_PLUGIN=ON
 
@@ -151,6 +153,7 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}/%{name}-uvg266.so
 %{_libdir}/%{name}/%{name}-vvdec.so
 %{_libdir}/%{name}/%{name}-vvenc.so
+%{_libdir}/%{name}/%{name}-x264.so
 %{_libdir}/%{name}/%{name}-x265.so
 
 %files tools
@@ -174,8 +177,13 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_mandir}/man3/heif.h.3*
 %{_mandir}/man3/heif_items.h.3*
 %{_mandir}/man3/heif_regions.h.3*
+%{_mandir}/man3/heif_text.h.3*
+%{_mandir}/man3/noname.gz
 
 %changelog
+* Sat Feb 14 2026 Simone Caronni <negativo17@gmail.com> - 1:1.21.2-1
+- Update to 1.21.2.
+
 * Sat Jan 24 2026 Simone Caronni <negativo17@gmail.com> - 1:1.20.2-2
 - Rebuild for updated dependencies.
 

@@ -1,23 +1,38 @@
+%bcond bootstrap 0
+
 Name:       libheif
 Epoch:      1
-Version:    1.21.2
-Release:    2%{?dist}
+Version:    1.23.4
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
 
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fix multilib issues: PLUGIN_DIRECTORY is derived from CMAKE_INSTALL_LIBDIR, the
+# macro has exactly one user, get_plugin_paths() in libheif/init.cc, which is internal
+# to the library, so pass it as a private compile definition instead of exporting it in
+# a public header.
+Patch1:     libheif-multilib-plugin-dir.patch
+# Encoder_HEVC/Encoder_VVC::get_data() dereference m_current_output_data without
+# checking it: when a get_data() call receives only parameter-set NALs (x265 emits
+# VPS/SPS/PPS from encoder_headers() when the sequence encoder is opened) the
+# optional is still empty. Caught by _GLIBCXX_ASSERTIONS in the
+# sequence_mixed_bit_depth test. Reported upstream.
+Patch2:     libheif-sequence-headers-only-crash.patch
 
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
-BuildRequires:  libavcodec-devel
 BuildRequires:  ninja-build
 BuildRequires:  openjpeg2-devel
 BuildRequires:  pkgconfig(aom)
 BuildRequires:  pkgconfig(dav1d)
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 BuildRequires:  pkgconfig(kvazaar)
+%if !%{with bootstrap}
+BuildRequires:  pkgconfig(libavcodec)
+%endif
 BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
@@ -28,7 +43,9 @@ BuildRequires:  pkgconfig(libvvenc) >= 1.12.0
 BuildRequires:  pkgconfig(openh264)
 BuildRequires:  pkgconfig(openjph) >= 0.18.0
 BuildRequires:  pkgconfig(rav1e)
+%if !%{with bootstrap}
 BuildRequires:  pkgconfig(sdl2)
+%endif
 BuildRequires:  pkgconfig(SvtAv1Enc)
 BuildRequires:  pkgconfig(uvg266)
 BuildRequires:  pkgconfig(x264)
@@ -80,8 +97,10 @@ developing applications that use %{name}.
   -DWITH_DAV1D=ON \
   -DWITH_DAV1D_PLUGIN=ON \
   -DWITH_EXAMPLES=ON \
+%if !%{with bootstrap}
   -DWITH_FFMPEG_DECODER=ON \
   -DWITH_FFMPEG_DECODER_PLUGIN=ON \
+%endif
   -DWITH_GDK_PIXBUF=OFF \
   -DWITH_KVAZAAR=ON \
   -DWITH_KVAZAAR_PLUGIN=ON \
@@ -94,6 +113,8 @@ developing applications that use %{name}.
   -DWITH_LIBSHARPYUV=ON \
   -DWITH_OpenH264_DECODER=ON \
   -DWITH_OpenH264_DECODER_PLUGIN=ON \
+  -DWITH_OpenH264_ENCODER=ON \
+  -DWITH_OpenH264_ENCODER_PLUGIN=ON \
   -DWITH_OpenJPEG_ENCODER=ON \
   -DWITH_OpenJPEG_ENCODER_PLUGIN=ON \
   -DWITH_OpenJPEG_DECODER=ON \
@@ -137,7 +158,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}/%{name}-aomdec.so
 %{_libdir}/%{name}/%{name}-aomenc.so
 %{_libdir}/%{name}/%{name}-dav1d.so
+%if !%{with bootstrap}
 %{_libdir}/%{name}/%{name}-ffmpegdec.so
+%endif
 %{_libdir}/%{name}/%{name}-j2kdec.so
 %{_libdir}/%{name}/%{name}-j2kenc.so
 %{_libdir}/%{name}/%{name}-jpegdec.so
@@ -160,7 +183,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_bindir}/heif-enc
 %{_bindir}/heif-info
 %{_bindir}/heif-thumbnailer
+%if !%{with bootstrap}
 %{_bindir}/heif-view
+%endif
 %{_mandir}/man1/heif-dec.1*
 %{_mandir}/man1/heif-enc.1*
 %{_mandir}/man1/heif-info.1*
@@ -172,13 +197,13 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/cmake/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/%{name}.so
-%{_mandir}/man3/heif.h.3*
-%{_mandir}/man3/heif_items.h.3*
-%{_mandir}/man3/heif_regions.h.3*
-%{_mandir}/man3/heif_text.h.3*
-%{_mandir}/man3/noname.gz
+%{_mandir}/man3/*
 
 %changelog
+* Mon Sep 14 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.4-1
+- Update to 1.23.4.
+- Add bootstrap option.
+
 * Fri May 22 2026 Simone Caronni <negativo17@gmail.com> - 1:1.21.2-2
 - Rebuild for updated dependencies.
 

@@ -1,0 +1,40 @@
+--- libheif-1.23.4/libheif/codecs/hevc_enc.cc	2026-09-06 16:43:19.000000000 +0200
++++ libheif-1.23.4/libheif/codecs/hevc_enc.cc	2026-09-14 18:23:18.496463267 +0200
+@@ -247,6 +247,17 @@
+     return {};
+   }
+ 
++  // The encoder can hand out parameter-set NALs before any slice data. x265,
++  // for example, emits VPS/SPS/PPS from encoder_headers() as soon as the
++  // sequence encoder is opened, so the first get_data() after
++  // start_sequence_encoding() sees only headers. Those are collected into
++  // m_hvcC and leave m_current_output_data unset, so there is no coded
++  // image to report yet. Without this check the dereferences below run on a
++  // disengaged std::optional.
++  if (!m_current_output_data) {
++    return {};
++  }
++
+   if (!m_encoded_image_width || !m_encoded_image_height) {
+     return Error(heif_error_Encoder_plugin_error,
+                  heif_suberror_Invalid_image_size);
+--- libheif-1.23.4/libheif/codecs/vvc_enc.cc	2026-09-06 16:43:19.000000000 +0200
++++ libheif-1.23.4/libheif/codecs/vvc_enc.cc	2026-09-14 18:23:18.496509404 +0200
+@@ -253,6 +253,17 @@
+     return {};
+   }
+ 
++  // The encoder can hand out parameter-set NALs before any slice data. x265,
++  // for example, emits VPS/SPS/PPS from encoder_headers() as soon as the
++  // sequence encoder is opened, so the first get_data() after
++  // start_sequence_encoding() sees only headers. Those are collected into
++  // m_vvcC and leave m_current_output_data unset, so there is no coded
++  // image to report yet. Without this check the dereferences below run on a
++  // disengaged std::optional.
++  if (!m_current_output_data) {
++    return {};
++  }
++
+   if (!m_encoded_image_width || !m_encoded_image_height) {
+     return Error(heif_error_Encoder_plugin_error,
+                  heif_suberror_Invalid_image_size);

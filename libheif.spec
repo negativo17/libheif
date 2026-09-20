@@ -3,7 +3,7 @@
 Name:       libheif
 Epoch:      1
 Version:    1.23.4
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -56,6 +56,9 @@ BuildRequires:  vvenc
 
 Requires:       shared-mime-info
 Obsoletes:      heif-pixbuf-loader < %{version}-%{release}
+
+Obsoletes:      %{name}-ffmpeg < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       %{name}-ffmpeg = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description
 libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format) file
@@ -200,6 +203,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_mandir}/man3/*
 
 %changelog
+* Sun Sep 20 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.4-3
+- Obsolete and provide libheif-ffmpeg.
+
 * Sun Sep 20 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.4-2
 - Rebuild for updated dependencies.
 

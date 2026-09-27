@@ -2,8 +2,8 @@
 
 Name:       libheif
 Epoch:      1
-Version:    1.23.4
-Release:    3%{?dist}
+Version:    1.23.5
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
@@ -14,12 +14,6 @@ Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # to the library, so pass it as a private compile definition instead of exporting it in
 # a public header.
 Patch1:     libheif-multilib-plugin-dir.patch
-# Encoder_HEVC/Encoder_VVC::get_data() dereference m_current_output_data without
-# checking it: when a get_data() call receives only parameter-set NALs (x265 emits
-# VPS/SPS/PPS from encoder_headers() when the sequence encoder is opened) the
-# optional is still empty. Caught by _GLIBCXX_ASSERTIONS in the
-# sequence_mixed_bit_depth test. Reported upstream.
-Patch2:     libheif-sequence-headers-only-crash.patch
 
 BuildRequires:  cmake
 BuildRequires:  doxygen
@@ -203,6 +197,9 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_mandir}/man3/*
 
 %changelog
+* Sun Sep 27 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.5-1
+- Update to 1.23.5.
+
 * Sun Sep 20 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.4-3
 - Obsolete and provide libheif-ffmpeg.
 

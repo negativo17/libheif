@@ -1,5 +1,11 @@
 %bcond bootstrap 0
 
+%if 0%{?rhel} && 0%{?rhel} <= 10
+%bcond pixbuf_loader 1
+%else
+%bcond pixbuf_loader 0
+%endif
+
 Name:       libheif
 Epoch:      1
 Version:    1.23.6
@@ -22,7 +28,9 @@ BuildRequires:  ninja-build
 BuildRequires:  openjpeg2-devel
 BuildRequires:  pkgconfig(aom)
 BuildRequires:  pkgconfig(dav1d)
+%if %{with pixbuf_loader}
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+%endif
 BuildRequires:  pkgconfig(kvazaar)
 %if !%{with bootstrap}
 BuildRequires:  pkgconfig(libavcodec)
@@ -48,8 +56,11 @@ BuildRequires:  pkgconfig(x265)
 BuildRequires:  vvdec
 BuildRequires:  vvenc
 
+%if %{without pixbuf_loader}
+Obsoletes:      heif-pixbuf-loader < 1.20.2-5
+%endif
+
 Requires:       shared-mime-info
-Obsoletes:      heif-pixbuf-loader < %{version}-%{release}
 
 Obsoletes:      %{name}-ffmpeg < %{?epoch:%{epoch}:}%{version}-%{release}
 Provides:       %{name}-ffmpeg = %{?epoch:%{epoch}:}%{version}-%{release}
@@ -69,13 +80,25 @@ Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 %description    tools
 This package provides tools for manipulating HEIF files.
 
-%package    devel
-Summary:    Development files for %{name}
-Requires:   %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
+
+%if %{with pixbuf_loader}
+%if !%{with bootstrap}
+%package -n     heif-pixbuf-loader
+Summary:        HEIF image loader for GTK+ applications
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       gdk-pixbuf2%{?_isa}
+
+%description -n heif-pixbuf-loader
+This package provides a plugin to load HEIF files in GTK+ applications.
+%endif
+%endif
 
 %prep
 %autosetup -p1
@@ -98,7 +121,11 @@ developing applications that use %{name}.
   -DWITH_FFMPEG_DECODER=ON \
   -DWITH_FFMPEG_DECODER_PLUGIN=ON \
 %endif
+%if %{without pixbuf_loader}
   -DWITH_GDK_PIXBUF=OFF \
+%else
+  -DWITH_GDK_PIXBUF=ON \
+%endif
   -DWITH_KVAZAAR=ON \
   -DWITH_KVAZAAR_PLUGIN=ON \
   -DWITH_JPEG_DECODER=ON \
@@ -196,9 +223,15 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/%{name}.so
 %{_mandir}/man3/*
 
+%if %{with pixbuf_loader}
+%files -n heif-pixbuf-loader
+%{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
+%endif
+
 %changelog
 * Tue Oct 06 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.6-1
 - Update to 1.23.6.
+- Import HEIF image loader for GTK+ applications conditionals from Fedora.
 
 * Sun Sep 27 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.5-1
 - Update to 1.23.5.

@@ -1,30 +1,69 @@
+%bcond bootstrap 0
+
+%if 0%{?rhel} && 0%{?rhel} <= 10
+%bcond pixbuf_loader 1
+%else
+%bcond pixbuf_loader 0
+%endif
+
 Name:       libheif
 Epoch:      1
-Version:    1.17.6
-Release:    3%{?dist}
+Version:    1.23.6
+Release:    1%{?dist}
 Summary:    ISO/IEC 23008-12:2017 HEIF and AVIF file format decoder and encoder
 License:    LGPLv3+ and MIT
 URL:        https://github.com/strukturag/%{name}
 
 Source0:    %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fix multilib issues: PLUGIN_DIRECTORY is derived from CMAKE_INSTALL_LIBDIR, the
+# macro has exactly one user, get_plugin_paths() in libheif/init.cc, which is internal
+# to the library, so pass it as a private compile definition instead of exporting it in
+# a public header.
+Patch1:     libheif-multilib-plugin-dir.patch
 
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
-BuildRequires:  libavcodec-devel
 BuildRequires:  ninja-build
 BuildRequires:  openjpeg2-devel
 BuildRequires:  pkgconfig(aom)
 BuildRequires:  pkgconfig(dav1d)
+%if %{with pixbuf_loader}
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+%endif
 BuildRequires:  pkgconfig(kvazaar)
+%if !%{with bootstrap}
+BuildRequires:  pkgconfig(libavcodec)
+%endif
 BuildRequires:  pkgconfig(libde265)
 BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libsharpyuv)
+BuildRequires:  pkgconfig(libtiff-4)
+BuildRequires:  pkgconfig(libvvdec) >= 3.0.0
+BuildRequires:  pkgconfig(libvvenc) >= 1.12.0
+BuildRequires:  pkgconfig(openh264)
+BuildRequires:  pkgconfig(openjph) >= 0.18.0
 BuildRequires:  pkgconfig(rav1e)
+%if !%{with bootstrap}
+BuildRequires:  pkgconfig(sdl2)
+%endif
 BuildRequires:  pkgconfig(SvtAv1Enc)
+BuildRequires:  pkgconfig(uvg266)
+BuildRequires:  pkgconfig(x264)
 BuildRequires:  pkgconfig(x265)
+# Requires the "vvdecapp" and "vvencapp" binaries:
+BuildRequires:  vvdec
+BuildRequires:  vvenc
+
+%if %{without pixbuf_loader}
+Obsoletes:      heif-pixbuf-loader < 1.20.2-5
+%endif
+
+Requires:       shared-mime-info
+
+Obsoletes:      %{name}-ffmpeg < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       %{name}-ffmpeg = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description
 libheif is an ISO/IEC 23008-12:2017 HEIF and AVIF (AV1 Image File Format) file
@@ -33,21 +72,33 @@ format decoder and encoder.
 HEIF and AVIF are new image file formats employing HEVC (h.265) or AV1 image
 coding, respectively, for the best compression ratios currently possible.
 
-%package    devel
-Summary:    Development files for %{name}
-Requires:   %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+%package        tools
+Summary:        Tools for manipulating HEIF files
+License:        MIT
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+
+%description    tools
+This package provides tools for manipulating HEIF files.
+
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
+%if %{with pixbuf_loader}
+%if !%{with bootstrap}
 %package -n     heif-pixbuf-loader
 Summary:        HEIF image loader for GTK+ applications
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       gdk-pixbuf2%{?_isa}
 
 %description -n heif-pixbuf-loader
 This package provides a plugin to load HEIF files in GTK+ applications.
+%endif
+%endif
 
 %prep
 %autosetup -p1
@@ -56,6 +107,8 @@ This package provides a plugin to load HEIF files in GTK+ applications.
 %cmake \
   -GNinja \
   -DBUILD_SHARED_LIBS=ON \
+  -DBUILD_TESTING=ON \
+  -DCMAKE_COMPILE_WARNING_AS_ERROR=OFF \
   -DENABLE_PLUGIN_LOADING=ON \
   -DWITH_AOM_DECODER=ON \
   -DWITH_AOM_DECODER_PLUGIN=ON \
@@ -64,8 +117,15 @@ This package provides a plugin to load HEIF files in GTK+ applications.
   -DWITH_DAV1D=ON \
   -DWITH_DAV1D_PLUGIN=ON \
   -DWITH_EXAMPLES=ON \
+%if !%{with bootstrap}
   -DWITH_FFMPEG_DECODER=ON \
   -DWITH_FFMPEG_DECODER_PLUGIN=ON \
+%endif
+%if %{without pixbuf_loader}
+  -DWITH_GDK_PIXBUF=OFF \
+%else
+  -DWITH_GDK_PIXBUF=ON \
+%endif
   -DWITH_KVAZAAR=ON \
   -DWITH_KVAZAAR_PLUGIN=ON \
   -DWITH_JPEG_DECODER=ON \
@@ -75,12 +135,30 @@ This package provides a plugin to load HEIF files in GTK+ applications.
   -DWITH_LIBDE265=ON \
   -DWITH_LIBDE265_PLUGIN=ON \
   -DWITH_LIBSHARPYUV=ON \
+  -DWITH_OpenH264_DECODER=ON \
+  -DWITH_OpenH264_DECODER_PLUGIN=ON \
+  -DWITH_OpenH264_ENCODER=ON \
+  -DWITH_OpenH264_ENCODER_PLUGIN=ON \
   -DWITH_OpenJPEG_ENCODER=ON \
+  -DWITH_OpenJPEG_ENCODER_PLUGIN=ON \
   -DWITH_OpenJPEG_DECODER=ON \
+  -DWITH_OpenJPEG_DECODER_PLUGIN=ON \
+  -DWITH_OPENJPH_ENCODER=ON \
+  -DWITH_OPENJPH_ENCODER_PLUGIN=ON \
   -DWITH_SvtEnc=ON \
   -DWITH_SvtEnc_PLUGIN=ON \
   -DWITH_RAV1E=ON \
   -DWITH_RAV1E_PLUGIN=ON \
+  -DWITH_REDUCED_VISIBILITY=ON \
+  -DWITH_UNCOMPRESSED_CODEC=ON \
+  -DWITH_UVG266=ON \
+  -DWITH_UVG266_PLUGIN=ON \
+  -DWITH_VVDEC=ON \
+  -DWITH_VVDEC_PLUGIN=ON \
+  -DWITH_VVENC=ON \
+  -DWITH_VVENC_PLUGIN=ON \
+  -DWITH_X264=ON \
+  -DWITH_X264_PLUGIN=ON \
   -DWITH_X265=ON \
   -DWITH_X265_PLUGIN=ON
 
@@ -92,30 +170,47 @@ This package provides a plugin to load HEIF files in GTK+ applications.
 cp -frv %{_vpath_builddir}/apidoc/man/man3 %{buildroot}%{_mandir}/
 rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 
+%check
+%ctest
+
 %files
 %license COPYING
 %doc README.md
-%{_bindir}/heif-convert
-%{_bindir}/heif-enc
-%{_bindir}/heif-info
-%{_bindir}/heif-thumbnailer
 %{_datadir}/thumbnailers/
 %{_libdir}/%{name}.so.1
 %{_libdir}/%{name}.so.%{version}
 %{_libdir}/%{name}/%{name}-aomdec.so
 %{_libdir}/%{name}/%{name}-aomenc.so
 %{_libdir}/%{name}/%{name}-dav1d.so
+%if !%{with bootstrap}
 %{_libdir}/%{name}/%{name}-ffmpegdec.so
+%endif
 %{_libdir}/%{name}/%{name}-j2kdec.so
 %{_libdir}/%{name}/%{name}-j2kenc.so
 %{_libdir}/%{name}/%{name}-jpegdec.so
 %{_libdir}/%{name}/%{name}-jpegenc.so
+%{_libdir}/%{name}/%{name}-jphenc.so
 %{_libdir}/%{name}/%{name}-kvazaar.so
 %{_libdir}/%{name}/%{name}-libde265.so
+%{_libdir}/%{name}/%{name}-openh264dec.so
 %{_libdir}/%{name}/%{name}-rav1e.so
 %{_libdir}/%{name}/%{name}-svtenc.so
+%{_libdir}/%{name}/%{name}-uvg266.so
+%{_libdir}/%{name}/%{name}-vvdec.so
+%{_libdir}/%{name}/%{name}-vvenc.so
+%{_libdir}/%{name}/%{name}-x264.so
 %{_libdir}/%{name}/%{name}-x265.so
-%{_mandir}/man1/heif-convert.1*
+
+%files tools
+%{_bindir}/heif-convert
+%{_bindir}/heif-dec
+%{_bindir}/heif-enc
+%{_bindir}/heif-info
+%{_bindir}/heif-thumbnailer
+%if !%{with bootstrap}
+%{_bindir}/heif-view
+%endif
+%{_mandir}/man1/heif-dec.1*
 %{_mandir}/man1/heif-enc.1*
 %{_mandir}/man1/heif-info.1*
 %{_mandir}/man1/heif-thumbnailer.1*
@@ -126,26 +221,18 @@ rm -f %{buildroot}%{_mandir}/man3/_builddir_build_BUILD_libheif*
 %{_libdir}/cmake/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/%{name}.so
-%{_mandir}/man3/heif.h.3*
-%{_mandir}/man3/heif_regions.h.3*
-%{_mandir}/man3/heif_color_conversion_options.3*
-%{_mandir}/man3/heif_color_profile_nclx.3*
-%{_mandir}/man3/heif_content_light_level.3*
-%{_mandir}/man3/heif_decoded_mastering_display_colour_volume.3*
-%{_mandir}/man3/heif_decoding_options.3*
-%{_mandir}/man3/heif_depth_representation_info.3*
-%{_mandir}/man3/heif_encoding_options.3*
-%{_mandir}/man3/heif_error.3*
-%{_mandir}/man3/heif_init_params.3*
-%{_mandir}/man3/heif_mastering_display_colour_volume.3*
-%{_mandir}/man3/heif_plugin_info.3*
-%{_mandir}/man3/heif_reader.3*
-%{_mandir}/man3/heif_writer.3*
+%{_mandir}/man3/*
 
+%if %{with pixbuf_loader}
 %files -n heif-pixbuf-loader
 %{_libdir}/gdk-pixbuf-2.0/*/loaders/libpixbufloader-heif.so
+%endif
 
 %changelog
+* Tue Oct 06 2026 Simone Caronni <negativo17@gmail.com> - 1:1.23.6-1
+- Update to 1.23.6.
+- Import HEIF image loader for GTK+ applications conditionals from Fedora.
+
 * Sun Aug 25 2024 Simone Caronni <negativo17@gmail.com> - 1:1.17.6-3
 - Split GTK loader in a separate subpackage.
 - Enable SVT-AV1 for aarch64.
